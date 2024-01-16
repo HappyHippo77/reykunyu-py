@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0","requests"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "reykunyu_py"
-version = "0.0.1"
+name = "reykunyu-py"
+version = "0.1.2"
 authors = [
   { name="Conner \"Nahura\" McKay"},
 ]
@@ -21,5 +21,5 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/HappyHippo77/reykunyu_py"
-Issues = "https://github.com/HappyHippo77/reykunyu_py/issues"
+Homepage = "https://github.com/HappyHippo77/reykunyu-py"
+Issues = "https://github.com/HappyHippo77/reykunyu-py/issues"

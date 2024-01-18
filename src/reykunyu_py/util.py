@@ -115,6 +115,11 @@ class Pronunciation:
         -------
         str
             The IPA transcription.
+
+        Raises
+        ------
+        ValueError
+            Raised if `dialect` is not one of ``['forest', 'reef']``.
         """
         valid_dialects = ['forest', 'reef']
         if dialect not in valid_dialects:
@@ -191,7 +196,13 @@ class Answer:
 
     @property
     def best_pronunciation(self):
-        """The first pronunciation in the list. (Pronunciation, read-only)"""
+        """The first pronunciation in the list. (Pronunciation, read-only)
+
+        Raises
+        ------
+        NoPronunciationError
+            Raised if there are no pronunciations for this word.
+        """
         if self._pronunciations:
             return self._pronunciations[0]
         else:

@@ -1,7 +1,6 @@
 from reykunyu_py import reykunyu
-import requests
 
-response = reykunyu.request("oel ngati kameie")
+response = reykunyu.request("kaltxì ma oeyä tsmukan")
 
 # all = requests.get("https://reykunyu.wimiso.nl/api/frau").json()
 # for entry in all:
@@ -11,5 +10,5 @@ response = reykunyu.request("oel ngati kameie")
 #     except TypeError:
 #         pass
 
-for entry in response.entries():
-    print(entry.best_answer().best_pronunciation().get())
+for entry in response.entries:
+    print(entry.best_answer.best_pronunciation.get())

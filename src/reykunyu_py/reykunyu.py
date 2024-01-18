@@ -1,5 +1,6 @@
+"""The main module of reykunyu-py. Most users should only need to import this module.
+"""
 import requests
-
 from reykunyu_py.util import Response
 
 

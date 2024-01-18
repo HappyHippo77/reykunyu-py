@@ -1,3 +1,7 @@
+"""Errors unique to reykunyu-py. Most users should not need to access this module.
+"""
+
+
 class WordNotRecognizedError(Exception):
     """Raised when a request for a specific answer is made to a Reykunyu Entry that has no valid answers."""
     def __init__(self, entry: str):

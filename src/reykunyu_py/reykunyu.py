@@ -1,7 +1,9 @@
 """The main module of reykunyu-py. Most users should only need to import this module.
 """
 import requests
-from reykunyu_py.util import Response
+
+import reykunyu_py.util
+from reykunyu_py.util import Response, DictionaryEntry
 
 
 def request(input_text: str) -> Response:
@@ -19,6 +21,28 @@ def request(input_text: str) -> Response:
     """
     return Response(input_text, requests.get("https://reykunyu.wimiso.nl/api/fwew?t%C3%ACpawm=" + input_text).json())
 
-# def dictionary() -> Dictionary:
-#     """Get the full list of words used by Reykunyu."""
-#     return Dictionary(requests.get("https://reykunyu.wimiso.nl/api/frau").json())
+
+raw_dictionary = requests.get("https://reykunyu.wimiso.nl/api/frau").json()
+"""The raw dictionary from Reykunyu. (dict, read-only)
+"""
+dictionary = {}
+"""The abstracted list of words that Reykunyu recognizes. (list[DictionaryEntry], read-only)
+"""
+for entry in raw_dictionary:
+    dictionary[entry.split(':')[0]] = DictionaryEntry((entry, raw_dictionary.get(entry)))
+
+
+def get_from_dictionary(navi: str) -> DictionaryEntry:
+    """Return the dictionary entry for the given Na'vi word.
+
+    Parameters
+    ----------
+    navi : str
+        The Na'vi word.
+
+    Returns
+    -------
+    DictionaryEntry
+        The dictionary entry for the word. If no entry is found, returns None.
+    """
+    return dictionary.get(navi)

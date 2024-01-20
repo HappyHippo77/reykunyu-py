@@ -150,7 +150,8 @@ class Answer:
 
     Notes
     -----
-    If an `Entry` may have multiple meanings it will have more than one `Answer`."""
+    If an `Entry` may have multiple meanings it will have more than one `Answer`.
+    """
     def __init__(self, data: dict):
         self._data = data
         self._translations = []
@@ -163,21 +164,25 @@ class Answer:
 
     @property
     def raw(self) -> dict:
-        """The raw data of the `Answer`. (dict, read-only)"""
+        """The raw data of the `Answer`. (dict, read-only)
+        """
         return self._data
 
     @property
     def root(self) -> str:
-        """The root word of the answer in Na'vi. (str, read-only)"""
+        """The root word of the answer in Na'vi. (str, read-only)
+        """
         return self._data.get("na'vi")
 
     @property
     def translations(self) -> list[Translation]:
-        """The list of translations for this word. (list[Translation], read-only)"""
+        """The list of translations for this word. (list[Translation], read-only)
+        """
         return self._translations
 
     def translate(self, lang_code) -> list[str]:
-        """Return all translations of a particular language."""
+        """Return all translations of a particular language.
+        """
         translations = []
         for entry in self._translations:
             translations.append(entry.translate(lang_code))
@@ -186,12 +191,14 @@ class Answer:
 
     @property
     def part_of_speech(self) -> str:
-        """The part of speech of the word. (str, read-only)"""
+        """The part of speech of the word. (str, read-only)
+        """
         return self._data.get("type")
 
     @property
     def pronunciations(self) -> list[Pronunciation]:
-        """The list of pronunciations of the word. (list[Pronunciation], read-only)"""
+        """The list of pronunciations of the word. (list[Pronunciation], read-only)
+        """
         return self._pronunciations
 
     @property
@@ -234,22 +241,26 @@ class Entry:
 
     @property
     def raw(self) -> dict:
-        """The raw data of the `Entry`. (dict, read-only)"""
+        """The raw data of the `Entry`. (dict, read-only)
+        """
         return self._data
 
     @property
     def input(self) -> str:
-        """The word as it was in the original input. (str, read-only)"""
+        """The word as it was in the original input. (str, read-only)
+        """
         return self._data.get("tìpawm")
 
     @property
     def answers(self) -> list[Answer]:
-        """The list of possible meanings and their info for this `Entry`. (list[Answer], read-only)"""
+        """The list of possible meanings and their info for this `Entry`. (list[Answer], read-only)
+        """
         return self._answers
 
     @property
     def best_answer(self) -> Answer:
-        """The first `Answer` for this `Entry`. (Answer, read-only)"""
+        """The first `Answer` for this `Entry`. (Answer, read-only)
+        """
         if self._answers:
             return self._answers[0]
         else:
@@ -280,12 +291,14 @@ class Response:
 
     @property
     def raw(self) -> list:
-        """The raw data of the `Response`. (list, read-only)"""
+        """The raw data of the `Response`. (list, read-only)
+        """
         return self._data
 
     @property
     def input(self) -> str:
-        """The original input sent to the Reykunyu API. (str, read-only)"""
+        """The original input sent to the Reykunyu API. (str, read-only)
+        """
         return self._input_text
 
     @property
@@ -307,3 +320,130 @@ class Response:
             The Entry at the specified index.
         """
         return self._entries[index]
+
+
+class DictionaryPronunciation:
+    """The pronunciation information for an entry in Reykunyu's Dictionary.
+
+    Attributes
+    ----------
+    raw
+
+    Parameters
+    ----------
+    data : dict
+        The raw data from Reykunyu.
+    """
+    def __init__(self, data: dict):
+        self._syllables = data.get("syllables").split('-')
+        try:
+            self._stressed_index = data.get("stressed") - 1
+        except TypeError:
+            self._stressed_index = 0
+
+    @property
+    def raw(self) -> tuple[list[str], int]:
+        """The list of syllables and the index of the stressed syllable. (tuple[list[str], int], read-only)
+        """
+        return self._syllables, self._stressed_index
+
+    def get(self, deliminator="-", prefix="", suffix="", capitalized=True):
+        """Return the pronunciation as a string, with a variety of options for stress marking.
+
+        Parameters
+        ----------
+        deliminator : str
+            The string used to separate the syllables. Default is ``"-"``.
+        prefix : str
+            A string that will be added immediately before the stressed syllable. Default is ``""``.
+        suffix : str
+            A string that will be added immediately after the stressed syllable. Default is ``""``.
+        capitalized : bool
+            If ``True``, the stressed syllable will be capitalized. Default is ``True``.
+
+        Returns
+        -------
+        str
+            The pronunciation, with the stressed syllable marked in the manner configured.
+        """
+        syllables = self._syllables
+        if capitalized:
+            syllables[self._stressed_index] = syllables[self._stressed_index].upper()
+        syllables[self._stressed_index] = prefix + syllables[self._stressed_index] + suffix
+        return deliminator.join(syllables)
+
+
+class DictionaryEntry:
+    """A class representing an entry in a `Dictionary`.
+
+    Attributes
+    ----------
+    raw
+    translations
+    part_of_speech
+    pronunciations
+    best_pronunciation
+
+    Parameters
+    ----------
+    data : tuple [str, dict]
+        The raw data of the `DictionaryEntry`. The first entry is the Na'vi word. The second entry is the dict V from Reykunyu.
+    """
+    def __init__(self, data: tuple[str, dict]):
+        self._word = data[0].split(":")[0]
+        self._data = data[1]
+        self._translations = []
+        for entry in data[1].get("translations"):
+            self._translations.append(Translation(self._word, entry))
+        self._pronunciations = []
+        if data[1].get("pronunciation"):
+            for pronunciation in data[1].get("pronunciation"):
+                self._pronunciations.append(DictionaryPronunciation(pronunciation))
+
+    @property
+    def raw(self) -> tuple[str, dict]:
+        """The raw data of the `DictionaryEntry`.
+        Formatted as a tuple, where the first entry is the Na'vi word, and the second entry is the dict V from Reykunyu. (tuple[str, dict], read-only)
+        """
+        return self._word, self._data
+
+    @property
+    def translations(self) -> list[Translation]:
+        """The list of translations for this word. (list[Translation], read-only)
+        """
+        return self._translations
+
+    def translate(self, lang_code) -> list[str]:
+        """Return all translations of a particular language.
+        """
+        translations = []
+        for entry in self._translations:
+            translations.append(entry.translate(lang_code))
+
+        return translations
+
+    @property
+    def part_of_speech(self) -> str:
+        """The part of speech of the word. (str, read-only)
+        """
+        return self._data.get("type")
+
+    @property
+    def pronunciations(self) -> list[DictionaryPronunciation]:
+        """The list of pronunciations of the word. (list[DictionaryPronunciation], read-only)
+        """
+        return self._pronunciations
+
+    @property
+    def best_pronunciation(self):
+        """The first pronunciation in the list. (Pronunciation, read-only)
+
+        Raises
+        ------
+        NoPronunciationError
+            Raised if there are no pronunciations for this word.
+        """
+        if self._pronunciations:
+            return self._pronunciations[0]
+        else:
+            raise NoPronunciationError(self._word)

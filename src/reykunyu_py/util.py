@@ -97,7 +97,7 @@ class Pronunciation:
         str
             The pronunciation, with the stressed syllable marked in the manner configured.
         """
-        syllables = self._syllables
+        syllables = self._syllables.copy()
         if capitalized:
             syllables[self._stressed_index] = syllables[self._stressed_index].upper()
         syllables[self._stressed_index] = prefix + syllables[self._stressed_index] + suffix
@@ -366,7 +366,7 @@ class DictionaryPronunciation:
         str
             The pronunciation, with the stressed syllable marked in the manner configured.
         """
-        syllables = self._syllables
+        syllables = self._syllables.copy()
         if capitalized:
             syllables[self._stressed_index] = syllables[self._stressed_index].upper()
         syllables[self._stressed_index] = prefix + syllables[self._stressed_index] + suffix

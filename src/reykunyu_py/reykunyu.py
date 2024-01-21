@@ -26,7 +26,7 @@ raw_dictionary = requests.get("https://reykunyu.wimiso.nl/api/frau").json()
 """The raw dictionary from Reykunyu. (dict, read-only)
 """
 dictionary = {}
-"""The abstracted list of words that Reykunyu recognizes. (list[DictionaryEntry], read-only)
+"""The abstracted list of words that Reykunyu recognizes. (dict[str, dict], read-only)
 """
 for entry in raw_dictionary:
     dictionary[entry.split(':')[0]] = DictionaryEntry((entry, raw_dictionary.get(entry)))
